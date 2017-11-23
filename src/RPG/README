@@ -1,0 +1,15 @@
+Here is how the layout of the program works
+
+We want to make events happen outside of Window.java, the only methods we need in that class are the ones that
+will let us change things in the game Window (hence the name Window)
+
+Every other game mechanic or calculation is kept to the classes of the entities, for example calculating the chance of
+getting loot loot after a kill would be a method in the Enemy.java file that's called after die() (or whatever I felt
+like naming that to)
+
+The Window setup seems intimidating but the only parts of the code that you really need to concern yourself with is
+after the main method past like 200 or so
+
+
+Brief description of the methods found in Window.java
+
