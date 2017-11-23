@@ -22,8 +22,14 @@ public class Game {
             if (command.equals("monster")){
                 Enemy enemy = new Enemy(1, "Worm");
                 encounterEnemy(enemy);
-
             }
+            else if (command.equals("hide")) {
+                window.setEnemyVisible(false);
+            }
+            else if (command.equals("health")){
+                window.setSelfHealth(-101);
+            }
+
         }
     }
 

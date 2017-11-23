@@ -54,13 +54,14 @@ public class Timur {
     }
 
     public void takeDamage(Integer damage, Enemy enemy){
+        // game lose is gonna be called from the handler that changes the UI
         if (this.health - damage < 0) {
             Game.loseGame(this);
         }
         this.health -= damage;
         // setSelfHealth will increase health if positive and decrease if negative
         // that's why we are multiplying it by -1
-        window.setSelfHealth(-1 * damage);
+        window.setSelfHealth(-1 * damage, this);
     }
 
 

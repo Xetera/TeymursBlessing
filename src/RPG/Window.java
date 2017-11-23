@@ -1,6 +1,8 @@
 package RPG;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,7 +19,10 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 
+import java.util.concurrent.Executors;
+
 import static java.lang.Integer.parseInt;
+import static java.lang.Thread.sleep;
 
 public class Window extends Application {
     private Game game;
@@ -166,6 +171,7 @@ public class Window extends Application {
         enemyStats.getChildren().addAll(enemyName, enemyHealth, enemySpecial);
         // TODO: display enemy levels properly with
         enemyView = new ImageView();
+
         setEnemyIcon("RPG/Media/snake.png");
         StackPane enemyPane = new StackPane();
         enemyPane.getChildren().addAll(enemyStats);
@@ -173,6 +179,7 @@ public class Window extends Application {
         //enemyPane
 
         // ---------enemy stats---------------
+
 
         // ------- Right-side Stats---------
         VBox rightStats = new VBox();
@@ -238,9 +245,69 @@ public class Window extends Application {
     // all these specific methods are here to make references, they will eventually just be condensed
     // to a single (updateEnemy) method inside the constructor of an Enemy object;
 
-    public void setSelfHealth(Integer value) {
-        Integer currentHealth = Integer.parseInt(selfHealthField.getText());
-        this.selfHealthField.setText(Integer.toString(currentHealth + value));
+    // WHAT A SPAGHETTI ASS CODE but it works
+    // I specifically made it this way so when health is updating you can see it move
+    public void setSelfHealth(Integer value, Timur player) {
+        Integer currentHealth = player.health;
+        Task task = new Task<Void>(){
+            @Override
+            public Void call() throws Exception{
+                // if the original value is positive (healing) use this which increments i
+                if (value > 0){
+                    int i = 0;
+                    while (true){
+                        final int finalI = i;
+                        if ( i > value){
+                            break;
+                        }
+                        if (currentHealth <= 0) {
+                            // put death here with reference to self
+                        }
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                selfHealthField.setText(Integer.toString(currentHealth + finalI));
+                            }
+                        });
+                        i++;
+                        try{
+                            Thread.sleep(10);
+                        }
+                        catch (java.lang.InterruptedException interrupt) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                }
+                else{
+                    // if value is negative (damage) use method that decrements value of i
+                    int i = 0;
+                    while (true){
+                        final int finalI = i;
+                        if ( i < value){
+                            break;
+                        }
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                selfHealthField.setText(Integer.toString(currentHealth + finalI));
+                            }
+                        });
+                        --i;
+                        try{
+                            Thread.sleep(10);
+                        }
+                        catch (java.lang.InterruptedException interrupt) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                }
+
+            return null;
+            }
+        };
+        Thread th = new Thread(task);
+        th.setDaemon(true);
+        th.start();
     }
 
     public void setSelfMana(Integer value){
@@ -273,10 +340,17 @@ public class Window extends Application {
     public void setEnemyName(String name){
         enemyName.setText(name);
     }
+
     public void setEnemyVisible(Boolean toggle){
-        enemy.setVisible(false);
+        if (toggle){
+            enemy.setVisible(true);
+        }
+        else {
+            enemy.setVisible(false);
+        }
+
     }
-    
+
     public void enemySpecialVisible(Boolean toggle){
         if (toggle){
             enemySpecialLabel.setVisible(true);
